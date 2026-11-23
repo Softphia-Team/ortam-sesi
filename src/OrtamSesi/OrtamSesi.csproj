@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AssemblyName>OrtamSesi</AssemblyName>
+    <RootNamespace>OrtamSesi</RootNamespace>
+    <Version>1.0.0</Version>
+    <Product>Ortam Sesi</Product>
+    <AssemblyTitle>Ortam Sesi</AssemblyTitle>
+    <Description>Ortam Sesi</Description>
+    <Copyright>MIT License</Copyright>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationIcon Condition="Exists('app.ico')">app.ico</ApplicationIcon>
+    <!-- Lightweight: one GC thread, no ICU, no extra language packs -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Ogg Vorbis decoder (MIT licensed, pure C#) -->
+    <PackageReference Include="NVorbis" Version="0.10.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Sound files and their list: copied to the "sounds" folder next to the exe -->
+    <None Include="..\..\sounds\**\*" LinkBase="sounds" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

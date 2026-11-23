@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Ortam Sesi test</title></head>
+<body style="background:#111;color:#ddd;font:20px system-ui,sans-serif;padding:24px">
+  <p id="s">Test sound playing (10 s, very quiet)…</p>
+  <audio id="a" src="assets/noise10s.wav" autoplay></audio>
+  <script>
+    const a = document.getElementById('a');
+    a.addEventListener('ended', () => { document.getElementById('s').textContent = 'Done. The page is still open but silent.'; });
+  </script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+# On every "v*" tag (e.g. v1.0.0): build, run the self-test, create the install zip and attach it to a GitHub Release.
+# Can also be run by hand (Actions > Release > Run workflow): then the zip is only uploaded as an artifact.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Publish (single-file exe + sounds)
+        run: dotnet publish src/OrtamSesi -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:DebugType=none -o dist
+
+      - name: Self-test (no audio device needed)
+        shell: pwsh
+        run: |
+          $p = Start-Process -FilePath dist/OrtamSesi.exe -ArgumentList '--selftest','--out','selftest.txt' -Wait -PassThru
+          Get-Content selftest.txt
+          if ($p.ExitCode -ne 0) { throw "Self-test failed" }
+
+      - name: Install package
+        shell: pwsh
+        run: |
+          $name = "OrtamSesi-" + ($env:GITHUB_REF_NAME -replace '^v','')
+          New-Item -ItemType Directory -Force pkg/OrtamSesi | Out-Null
+          Copy-Item dist, scripts, Install.cmd, Uninstall.cmd, README.md, LICENSE -Destination pkg/OrtamSesi -Recurse
+          Compress-Archive -Path pkg/OrtamSesi -DestinationPath "$name.zip"
+          "ZIP=$name.zip" >> $env:GITHUB_ENV
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OrtamSesi
+          path: ${{ env.ZIP }}
+
+      - name: GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}
+          generate_release_notes: true
